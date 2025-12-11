@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthModule } from './modules/health/health.module';
+import { VehiclesModule } from './modules/vehicles/vehicles.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -34,7 +35,7 @@ import configuration from './config/configuration';
       },
     }),
     HealthModule,
+    VehiclesModule,
   ],
-  providers: [],
 })
 export class AppModule {}
