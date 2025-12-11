@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16
+    container_name: transport-radar-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: transport_radar
+    ports:
+      - "5432:5432"
+    volumes:
+      - transport_radar_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  transport_radar_data:
