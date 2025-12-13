@@ -1,4 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { VehicleEntity } from './entities/vehicle.entity';
+import { Repository } from 'typeorm';
 
 export interface Vehicle {
   id: string;
@@ -14,36 +17,16 @@ export interface Vehicle {
 
 @Injectable()
 export class VehiclesService {
-  private readonly vehicles: Vehicle[] = [
-    {
-      id: '1',
-      type: 'aircraft',
-      callsign: 'IBE1234',
-      originCountry: 'Spain',
-      latitude: 40.4168,
-      longitude: -3.7038,
-      altitude: 10000,
-      heading: 180,
-      speed: 750,
-    },
-    {
-      id: '2',
-      type: 'aircraft',
-      callsign: 'AFR5678',
-      originCountry: 'France',
-      latitude: 48.8566,
-      longitude: 2.3522,
-      altitude: 9000,
-      heading: 90,
-      speed: 720,
-    },
-  ];
+  constructor(
+    @InjectRepository(VehicleEntity)
+    private readonly vehiclesRepository: Repository<VehicleEntity>,
+  ) {}
 
-  findAll(): Vehicle[] {
-    return this.vehicles;
+  async findAll(): Promise<VehicleEntity[]> {
+    return this.vehiclesRepository.find();
   }
 
-  findOne(id: string): Vehicle | undefined {
-    return this.vehicles.find((v) => v.id === id);
+  async findOne(id: string): Promise<VehicleEntity | null> {
+    return this.vehiclesRepository.findOne({ where: { id } });
   }
 }
