@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { VehicleEntity } from './entities/vehicle.entity';
 
@@ -13,6 +13,10 @@ export class VehiclesController {
 
   @Get(':id')
   async getVehicleById(@Param('id') id: string): Promise<VehicleEntity | null> {
-    return this.vehiclesService.findOne(id);
+    const vehicle = await this.vehiclesService.findOne(id);
+    if (!vehicle) {
+      throw new NotFoundException(`Vehicle with id ${id} not found`);
+    }
+    return vehicle;
   }
 }
