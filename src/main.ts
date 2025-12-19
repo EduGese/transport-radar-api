@@ -11,6 +11,11 @@ async function bootstrap() {
 
   setupSwagger(app);
 
+  app.enableCors({
+    origin: 'http://localhost:4200', // URL de tu Angular en dev
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+  });
   await app.listen(port);
 }
 bootstrap().catch((err) => {
