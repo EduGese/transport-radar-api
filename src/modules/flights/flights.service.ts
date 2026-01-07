@@ -7,13 +7,17 @@ import {
   OpenSkyStateVector,
 } from './interfaces/opensky-state-vector.interface';
 import { FlightsLiveResponseDto } from './dto/flights-live-response.dto';
+import { AircraftService } from '../aircraft/aircraft.service';
 
 @Injectable()
 export class FlightsService {
   private readonly logger = new Logger(FlightsService.name);
   private readonly baseUrl = 'https://opensky-network.org/api';
 
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    private readonly http: HttpService,
+    private readonly aircraftService: AircraftService,
+  ) {}
 
   async getLiveFlights(bbox?: {
     lamin: number;
@@ -50,9 +54,8 @@ export class FlightsService {
         flights: [],
       };
     }
-    console.log('data.states', data.states);
-    const flights = (data.states ?? []).map((state: OpenSkyStateVector) =>
-      this.mapStateToDto(state),
+    const flights = await Promise.all(
+      data.states.map((state) => this.mapStateToDtoWithMetadata(state)),
     );
     return {
       time: data.time,
@@ -67,10 +70,29 @@ export class FlightsService {
     dto.originCountry = state[2];
     dto.longitude = state[5];
     dto.latitude = state[6];
-    dto.altitude = state[7];
+    dto.altitudeBaro = state[7];
+    dto.altitudeGeo = state[13];
+    dto.onGround = state[8];
     dto.velocity = state[9];
     dto.heading = state[10];
-    dto.category = state[17];
+    return dto;
+  }
+  private async mapStateToDtoWithMetadata(
+    state: OpenSkyStateVector,
+  ): Promise<FlightDto> {
+    const dto = this.mapStateToDto(state);
+
+    const aircraft = await this.aircraftService.findByIcao24(dto.icao24);
+    if (aircraft) {
+      // eslint-disable-next-line prettier/prettier
+      dto.category = aircraft.category_description === '' ? null : aircraft.category_description;
+      dto.model = aircraft.model === '' ? null : aircraft.model;
+      dto.operator = aircraft.operator === '' ? null : aircraft.operator;
+      dto.operatorIcao =
+        aircraft.operator_icao === '' ? null : aircraft.operator_icao;
+      dto.owner = aircraft.owner === '' ? null : aircraft.owner;
+    }
+
     return dto;
   }
 }
