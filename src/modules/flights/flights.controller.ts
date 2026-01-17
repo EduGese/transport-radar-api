@@ -1,4 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { FlightsLiveResponseDto } from './dto/flights-live-response.dto';
 
@@ -25,10 +31,20 @@ export class FlightsController {
         lomax: Number(lomax),
       };
     }
-    console.log(
-      'this.flightsService.getLiveFlights(bbox)',
-      this.flightsService.getLiveFlights(bbox),
-    );
-    return this.flightsService.getLiveFlights(bbox);
+    try {
+      // console.log(
+      //   'this.flightsService.getLiveFlights(bbox)',
+      //   this.flightsService.getLiveFlights(bbox),
+      // );
+      return this.flightsService.getLiveFlights(bbox);
+    } catch (error) {
+      console.error(
+        `Controller error: ${error instanceof Error ? error.message : 'Unknown'}`,
+      );
+      throw new HttpException(
+        'Flight data unavailable',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
   }
 }

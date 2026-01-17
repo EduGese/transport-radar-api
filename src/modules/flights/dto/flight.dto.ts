@@ -2,6 +2,8 @@ export class FlightDto {
   icao24: string;
   callsign: string | null;
   originCountry: string;
+  timePosition: number | null;
+  lastContact: number;
   latitude: number | null;
   longitude: number | null;
   altitudeBaro: number | null;

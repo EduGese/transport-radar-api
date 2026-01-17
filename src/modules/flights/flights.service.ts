@@ -8,6 +8,7 @@ import {
 } from './interfaces/opensky-state-vector.interface';
 import { FlightsLiveResponseDto } from './dto/flights-live-response.dto';
 import { AircraftService } from '../aircraft/aircraft.service';
+import { OpenSkyAuthService } from '../opensky-auth/opensky-auth.service';
 
 @Injectable()
 export class FlightsService {
@@ -17,6 +18,7 @@ export class FlightsService {
   constructor(
     private readonly http: HttpService,
     private readonly aircraftService: AircraftService,
+    private readonly authService: OpenSkyAuthService,
   ) {}
 
   async getLiveFlights(bbox?: {
@@ -43,24 +45,39 @@ export class FlightsService {
     params.lomax = finalBbox.lomax;
 
     const url = `${this.baseUrl}/states/all`;
+    const token = await this.authService.getAccessToken();
+    try {
+      const { data } = await firstValueFrom(
+        this.http.get<OpenSkyStatesResponse>(url, {
+          params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      );
 
-    const { data } = await firstValueFrom(
-      this.http.get<OpenSkyStatesResponse>(url, { params }),
-    );
-
-    if (!data || !data.states) {
+      if (!data || !data.states) {
+        return {
+          time: data?.time ?? Math.floor(Date.now() / 1000),
+          flights: [],
+        };
+      }
+      const flights = await Promise.all(
+        data.states.map((state) => this.mapStateToDtoWithMetadata(state)),
+      );
       return {
-        time: data?.time ?? Math.floor(Date.now() / 1000),
+        time: data.time,
+        flights,
+      };
+    } catch (error: unknown) {
+      this.logger.error(
+        `Error fetching OpenSky data:  ${error instanceof Error ? error.message : 'Unknown'}`,
+      );
+      return {
+        time: Math.floor(Date.now() / 1000),
         flights: [],
       };
     }
-    const flights = await Promise.all(
-      data.states.map((state) => this.mapStateToDtoWithMetadata(state)),
-    );
-    return {
-      time: data.time,
-      flights,
-    };
   }
 
   private mapStateToDto(state: OpenSkyStateVector): FlightDto {
@@ -68,6 +85,8 @@ export class FlightsService {
     dto.icao24 = state[0];
     dto.callsign = state[1] ? String(state[1]).trim() : null;
     dto.originCountry = state[2];
+    dto.timePosition = state[3];
+    dto.lastContact = state[4];
     dto.longitude = state[5];
     dto.latitude = state[6];
     dto.altitudeBaro = state[7];
@@ -84,8 +103,10 @@ export class FlightsService {
 
     const aircraft = await this.aircraftService.findByIcao24(dto.icao24);
     if (aircraft) {
-      // eslint-disable-next-line prettier/prettier
-      dto.category = aircraft.category_description === '' ? null : aircraft.category_description;
+      dto.category =
+        aircraft.category_description === ''
+          ? null
+          : aircraft.category_description;
       dto.model = aircraft.model === '' ? null : aircraft.model;
       dto.operator = aircraft.operator === '' ? null : aircraft.operator;
       dto.operatorIcao =

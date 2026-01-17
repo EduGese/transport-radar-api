@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { VehiclesModule } from './modules/vehicles/vehicles.module';
 import { FlightsModule } from './modules/flights/flights.module';
 import { AircraftModule } from './modules/aircraft/aircraft.module';
+import { OpenSkyAuthModule } from './modules/opensky-auth/opensky-auth.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -40,6 +41,8 @@ import configuration from './config/configuration';
     VehiclesModule,
     FlightsModule,
     AircraftModule,
+    OpenSkyAuthModule,
   ],
+  providers: [],
 })
 export class AppModule {}
