@@ -6,6 +6,7 @@ import { VehiclesModule } from './modules/vehicles/vehicles.module';
 import { FlightsModule } from './modules/flights/flights.module';
 import { AircraftModule } from './modules/aircraft/aircraft.module';
 import { OpenSkyAuthModule } from './modules/opensky-auth/opensky-auth.module';
+import { AircraftPhotosModule } from './modules/aircraft-photos/aircraft-photos.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -42,6 +43,7 @@ import configuration from './config/configuration';
     FlightsModule,
     AircraftModule,
     OpenSkyAuthModule,
+    AircraftPhotosModule,
   ],
   providers: [],
 })
