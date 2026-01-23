@@ -19,4 +19,10 @@ export class AircraftEntity {
 
   @Column({ type: 'text', nullable: true })
   owner: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  typecode: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  registration: string | null;
 }

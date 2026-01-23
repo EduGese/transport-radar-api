@@ -94,6 +94,9 @@ export class FlightsService {
     dto.onGround = state[8];
     dto.velocity = state[9];
     dto.heading = state[10];
+    dto.verticalRate = state[11];
+    dto.squawk = state[14];
+    dto.spi = state[15];
     return dto;
   }
   private async mapStateToDtoWithMetadata(
@@ -112,6 +115,9 @@ export class FlightsService {
       dto.operatorIcao =
         aircraft.operator_icao === '' ? null : aircraft.operator_icao;
       dto.owner = aircraft.owner === '' ? null : aircraft.owner;
+      dto.typecode = aircraft.typecode === '' ? null : aircraft.typecode;
+      dto.registration =
+        aircraft.registration === '' ? null : aircraft.registration;
     }
 
     return dto;

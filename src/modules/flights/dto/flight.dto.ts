@@ -16,4 +16,9 @@ export class FlightDto {
   operator: string | null;
   operatorIcao: string | null;
   owner: string | null;
+  typecode: string | null;
+  registration: string | null;
+  verticalRate: number | null;
+  squawk: string | null;
+  spi: boolean;
 }
