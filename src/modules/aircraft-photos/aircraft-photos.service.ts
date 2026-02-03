@@ -4,12 +4,21 @@ import { firstValueFrom } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 import { AircraftPhotoResponseDto } from './dto/aircraft-photo-response.dto';
 import { PlanespottersResponse } from './interfaces/planespotter-response.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AircraftPhotosService {
-  private readonly baseUrl = 'https://api.planespotters.net/pub/photos/hex';
+  private readonly baseUrl: string;
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    const planespottersConfig = this.configService.get<{ baseUrl: string }>(
+      'planespotters',
+    )!;
+    this.baseUrl = planespottersConfig.baseUrl;
+  }
 
   async getPhotosByIcao24(
     icao24: string,
