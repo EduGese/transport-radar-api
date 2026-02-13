@@ -20,6 +20,7 @@ export default () => ({
   },
   planespotters: {
     baseUrl:
-      process.env.PLANESPOTTERS_BASE_URL ?? 'https://api.planespotters.net',
+      process.env.PLANESPOTTERS_BASE_URL ??
+      'https://api.planespotters.net/pub/photos/hex',
   },
 });
