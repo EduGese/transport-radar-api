@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:16
@@ -8,10 +6,24 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: transport_radar
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - transport_radar_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  api:
+    build: .
+    env_file:
+      - ./docker/api.env
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    restart: unless-stopped
+
 volumes:
   transport_radar_data:
+    external: true
+    name: docker_transport_radar_data

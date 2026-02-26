@@ -1,5 +1,5 @@
 {
-  "name": "transport-radar-api",
+  "name": "air-tracker-api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -20,7 +20,22 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "stack:up": "docker compose -f .\\docker-compose.stack.yml up -d --build",
+    "stack:down": "docker compose -f .\\docker-compose.stack.yml down",
+    "stack:stop": "docker compose -f .\\docker-compose.stack.yml stop",
+    "stack:start": "docker compose -f .\\docker-compose.stack.yml start",
+    "stack:logs:api": "docker compose -f .\\docker-compose.stack.yml logs -f api",
+    "stack:ps": "docker compose -f .\\docker-compose.stack.yml ps",
+    "db:tables": "docker compose -f .\\docker-compose.stack.yml exec db psql -U postgres -d transport_radar -c \"\\\\dt\"",
+    "prod:up": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml up -d --build",
+    "prod:down": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml down",
+    "prod:logs": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml logs -f --tail=200",
+    "prod:ps": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml ps",
+    "data:dump:aircraft": "docker compose -f .\\docker-compose.stack.yml exec -T db pg_dump -U postgres -d transport_radar -t public.aircraft -t public.aircraft_photos -F c -f /tmp/aircraft.dump && docker cp transport-radar-api-db-1:/tmp/aircraft.dump .\\deploy\\aircraft.dump",
+    "data:restore:aircraft:prod": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml exec -T db pg_restore -U postgres -d transport_radar --clean --if-exists .\\deploy\\aircraft.dump",
+    "prod:stop": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml stop",
+    "prod:stop:api": "docker compose --env-file .\\deploy\\.env.prod -f .\\deploy\\docker-compose.prod.yml stop api"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
